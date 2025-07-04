@@ -27,9 +27,17 @@ def enviar_alerta_mensaje(mensaje):
         "text": mensaje,
         "parse_mode": "Markdown"
     }
-    requests.post(url, data=data)
 
-def obtener_precio_ida_vuelta(origen, destino, fecha_ida, fecha_vuelta):
+    try:
+        response = requests.post(url, data=data)
+        if response.status_code == 200:
+            print("✅ Mensaje enviado correctamente a Telegram")
+        else:
+            print(f"❌ Error al enviar mensaje: {response.status_code}")
+            print(response.text)
+    except Exception as e:
+        print(f"❌ Excepción al enviar mensaje a Telegram: {e}")
+
     params = {
         "legs": json.dumps([
             {"origin": origen, "destination": destino, "date": fecha_ida},
@@ -96,4 +104,7 @@ for i in range(0, dias, 3):
 
 if mensajes:
     texto_final = "\n\n".join(mensajes)
+    print(f"📤 Enviando {len(mensajes)} mensajes a Telegram...")
     enviar_alerta_mensaje(texto_final)
+else:
+    print("⚠️ No se encontraron vuelos con resultados para enviar.")
