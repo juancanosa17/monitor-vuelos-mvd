@@ -36,6 +36,10 @@ def obtener_precio_ida_vuelta(origen, destino, fecha_ida, fecha_vuelta):
 
     try:
         response = requests.get(API_URL, headers=HEADERS, params=params, timeout=30)
+        print(f"▶️ Consultando: {origen} → {destino} ({fecha_ida} → {fecha_vuelta})")
+        print("📝 URL:", response.url)
+        print("🔢 Código de estado:", response.status_code)
+        print("📦 Respuesta:", response.text[:300])  # primera parte
         data = response.json()
 
         resultados = []
