@@ -1,0 +1,31 @@
+name: Monitoreo de vuelos baratos
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  buscar-vuelos:
+    runs-on: ubuntu-latest
+
+    env:
+      RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+      RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Ejecutar script de búsqueda de vuelos
+        run: python buscar_vuelos.py
