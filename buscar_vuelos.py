@@ -56,7 +56,6 @@ def obtener_precio_ida_vuelta(origen, destino, fecha_ida, fecha_vuelta):
         print(f"❌ Error al obtener precio: {e}")
         return None
 
-
 def enviar_alerta_mensaje(mensaje):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     data = {
@@ -75,41 +74,7 @@ def enviar_alerta_mensaje(mensaje):
     except Exception as e:
         print(f"❌ Excepción al enviar mensaje a Telegram: {e}")
 
-    params = {
-        "legs": json.dumps([
-            {"origin": origen, "destination": destino, "date": fecha_ida},
-            {"origin": destino, "destination": origen, "date": fecha_vuelta}
-        ]),
-        "adults": 1,
-        "cabinClass": "economy",
-        "currency": "USD",
-        "locale": "en-US",
-        "market": "en-US",
-        "countryCode": "US"
-    }
-
-    try:
-        response = requests.get(API_URL, headers=HEADERS, params=params, timeout=30)
-        data = response.json()
-
-        resultados = []
-        for vuelo in data.get("data", []):
-            precio = vuelo.get("price")
-            aerolinea = vuelo.get("airline", "Desconocida")
-            escalas = vuelo.get("stops", "N/A")
-            if precio:
-                resultados.append({
-                    "precio": precio,
-                    "aerolinea": aerolinea,
-                    "escalas": escalas
-                })
-
-        return min(resultados, key=lambda x: x["precio"]) if resultados else None
-
-    except Exception as e:
-        return None
-
-# Fecha
+# Generar fechas y buscar vuelos
 fecha_hoy = datetime.today()
 fecha_fin = fecha_hoy + timedelta(days=30*MESES_ADELANTE)
 dias = (fecha_fin - fecha_hoy).days
@@ -126,22 +91,21 @@ for i in range(0, dias, 3):
             aerolinea = resultado['aerolinea']
             escalas = resultado['escalas']
 
-            # Crear link de compra (Google Flights)
+            # Link a Google Flights
             link = f"https://www.google.com/flights?hl=es#flt={ORIGEN}.{destino}.{fecha_ida}*{destino}.{ORIGEN}.{fecha_vuelta};c:USD;e:1;sd:1;t:e"
-            link_encoded = urllib.parse.quote(link, safe=':/?=&')
-
             mensaje = (
                 f"*{ORIGEN} → {destino}*\n"
-                f" *USD {precio}*\n"
-                f" ({fecha_ida} → {fecha_vuelta})\n"
-                f" {aerolinea} ({escalas} escalas)\n"
-                f"[ Ver vuelo]({link})"
+                f"💰 *USD {precio}*\n"
+                f"📅 ({fecha_ida} → {fecha_vuelta})\n"
+                f"✈ {aerolinea} ({escalas} escalas)\n"
+                f"[🛒 Ver vuelo]({link})"
             )
             mensajes.append(mensaje)
 
+# Enviar alertas si hay mensajes
 if mensajes:
     texto_final = "\n\n".join(mensajes)
-    print(f"📤 Enviando {len(mensajes)} mensajes a Telegram...")
+    print(f" Enviando {len(mensajes)} mensaje(s) a Telegram...")
     enviar_alerta_mensaje(texto_final)
 else:
-    print("⚠️ No se encontraron vuelos con resultados para enviar.")
+    print(" No se encontraron vuelos con resultados para enviar.")
