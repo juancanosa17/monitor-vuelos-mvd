@@ -87,10 +87,10 @@ for i in range(0, dias, 3):
 
             mensaje = (
                 f"*{ORIGEN} → {destino}*\n"
-                f"💰 *USD {precio}*\n"
-                f"📅 ({fecha_ida} → {fecha_vuelta})\n"
-                f✈️ {aerolinea} ({escalas} escalas)\n"
-                f"[🛒 Ver vuelo]({link})"
+                f" *USD {precio}*\n"
+                f" ({fecha_ida} → {fecha_vuelta})\n"
+                f" {aerolinea} ({escalas} escalas)\n"
+                f"[ Ver vuelo]({link})"
             )
             mensajes.append(mensaje)
 
